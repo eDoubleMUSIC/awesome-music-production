@@ -1,8 +1,5 @@
 import { Platform } from 'react-native';
-import Purchases, {
-  LOG_LEVEL,
-  type PurchasesPackage,
-} from 'react-native-purchases';
+import type { PurchasesPackage } from 'react-native-purchases';
 
 import { Flags, getFlag, setFlag } from './flags';
 
@@ -11,9 +8,10 @@ import { Flags, getFlag, setFlag } from './flags';
  * Research: hard-ish paywalls convert ~5x better and ~2x LTV vs freemium
  * subscriptions for occasional-use utilities, and dodge subscription fatigue.
  *
- * Wraps RevenueCat. If no API key is configured yet (e.g. running in Expo Go
- * or before store setup), it degrades to a local "dev" mode backed by a flag,
- * so the whole flow is testable end-to-end before the store accounts exist.
+ * Wraps RevenueCat, loaded LAZILY so the app also runs in Expo Go (which does
+ * not bundle the native react-native-purchases module). If no API key is
+ * configured (e.g. Expo Go, or before store setup), it degrades to a local
+ * "dev" unlock backed by a flag, so the whole flow is testable end-to-end.
  */
 export const PRO_ENTITLEMENT = 'pro';
 export const LIFETIME_PRODUCT_ID = 'liedger_lifetime';
@@ -32,9 +30,15 @@ function hasKey(): boolean {
   return key.length > 0;
 }
 
+// Lazy native-module loader — never touched in Expo Go / dev mode.
+async function loadPurchases() {
+  const mod = await import('react-native-purchases');
+  return mod.default;
+}
+
 export async function configurePurchases(): Promise<void> {
   if (configured || !hasKey()) return;
-  if (__DEV__) Purchases.setLogLevel(LOG_LEVEL.WARN);
+  const Purchases = await loadPurchases();
   Purchases.configure({
     apiKey: Platform.OS === 'ios' ? RC_API_KEY.ios : RC_API_KEY.android,
   });
@@ -46,6 +50,7 @@ export async function isPro(): Promise<boolean> {
   if (!hasKey()) return getFlag(Flags.proUnlockedCache);
   try {
     await configurePurchases();
+    const Purchases = await loadPurchases();
     const info = await Purchases.getCustomerInfo();
     const pro = info.entitlements.active[PRO_ENTITLEMENT] !== undefined;
     await setFlag(Flags.proUnlockedCache, pro);
@@ -60,6 +65,7 @@ export async function getLifetimePackage(): Promise<PurchasesPackage | null> {
   if (!hasKey()) return null;
   try {
     await configurePurchases();
+    const Purchases = await loadPurchases();
     const offerings = await Purchases.getOfferings();
     const pkgs = offerings.current?.availablePackages ?? [];
     return (
@@ -74,13 +80,15 @@ export async function getLifetimePackage(): Promise<PurchasesPackage | null> {
 
 /** Returns true if the user now owns Pro. */
 export async function purchaseLifetime(): Promise<boolean> {
-  // Dev mode: simulate a successful purchase so the flow is testable.
+  // Dev mode (Expo Go / no keys): simulate a successful purchase so the flow
+  // is fully testable.
   if (!hasKey()) {
     await setFlag(Flags.proUnlockedCache, true);
     return true;
   }
   try {
     await configurePurchases();
+    const Purchases = await loadPurchases();
     const pkg = await getLifetimePackage();
     if (!pkg) return false;
     const { customerInfo } = await Purchases.purchasePackage(pkg);
@@ -96,6 +104,7 @@ export async function restorePurchases(): Promise<boolean> {
   if (!hasKey()) return getFlag(Flags.proUnlockedCache);
   try {
     await configurePurchases();
+    const Purchases = await loadPurchases();
     const info = await Purchases.restorePurchases();
     const pro = info.entitlements.active[PRO_ENTITLEMENT] !== undefined;
     await setFlag(Flags.proUnlockedCache, pro);
