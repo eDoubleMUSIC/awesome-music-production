@@ -1,0 +1,51 @@
+name: faceless-reels
+
+# The "deploy + self-manage" mechanism: this runs on a schedule with no human in
+# the loop. It generates a video each run and uploads it as an artifact. It only
+# auto-POSTS when the repo variable FACELESS_PUBLISH is set to 'true' (review-mode
+# by default, so nothing goes public until you flip that switch).
+
+on:
+  schedule:
+    - cron: "0 14 * * *"      # daily at 14:00 UTC — change to your cadence
+  workflow_dispatch:           # also runnable on-demand from the Actions tab
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: faceless-reels
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Generate (and publish if FACELESS_PUBLISH=true)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          UPLOAD_POST_API_KEY: ${{ secrets.UPLOAD_POST_API_KEY }}
+          UPLOAD_POST_USER: ${{ secrets.UPLOAD_POST_USER }}
+          FACELESS_PUBLISH: ${{ vars.FACELESS_PUBLISH }}
+        run: |
+          cp config.example.yaml config.yaml
+          PUBLISH_FLAG=""
+          if [ "$FACELESS_PUBLISH" = "true" ]; then PUBLISH_FLAG="--publish"; fi
+          python run.py --auto 1 $PUBLISH_FLAG
+
+      - name: Upload generated video for review
+        uses: actions/upload-artifact@v4
+        with:
+          name: faceless-reel-${{ github.run_number }}
+          path: faceless-reels/out/**/*.mp4
+          if-no-files-found: warn
+          retention-days: 14

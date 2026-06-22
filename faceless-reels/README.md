@@ -5,8 +5,10 @@ It turns a topic into a captioned 9:16 video and publishes it to **Instagram Ree
 YouTube Shorts, and TikTok** — the same generate-and-auto-post loop those tools sell
 for $19–69/month, built from commodity APIs you control.
 
-> Built for the [Leo Mask](https://www.leomask.com/) faceless-artist workflow, but the
-> niche/voice/visuals are all config — point it at anything.
+> Default lane: **AI tools / AI side-hustles** — the highest-ROI lane for a faceless
+> automated short-form business (top-tier buyer intent → recurring SaaS affiliate +
+> sponsorships + a digital product, not just ad pennies). The niche/voice/visuals are
+> all config, so you can point it at anything.
 
 ## Why this exists (the short version)
 
@@ -126,18 +128,39 @@ feeding it, not as a video source. To wire a generative model in, add a `veo` br
 `frpipe/visuals.py` that returns a finished audio+video clip and have `generate.py` skip
 the TTS/caption stages for that path (left as a clearly-marked extension point).
 
-## Going fully automated (the "while you sleep" part)
+## Deploy + self-manage (it runs itself)
 
-`run.py` is intentionally a one-shot CLI so you can wire it into whatever scheduler you
-trust. Pick one:
+A scheduled **GitHub Actions workflow** (`.github/workflows/faceless-reels.yml`) is the
+deployment — it runs daily with **no human in the loop**: Claude invents a fresh topic
+(`run.py --auto 1`), the pipeline builds the video, and the result is uploaded as a
+downloadable artifact. It only **auto-posts** when you opt in (see below), so by default
+it's a safe review loop.
 
-- **cron** — `0 9,17 * * * cd /path/faceless-reels && .venv/bin/python run.py --topics-file topics.txt --publish`
-- **n8n / Make.com** — call `run.py` from an Execute Command node on a schedule; both
-  have ready-made faceless-video templates you can crib the trigger logic from.
-- **GitHub Actions** — a `schedule:` workflow that runs the CLI and posts (keys as repo secrets).
+```bash
+# Run the autonomous path locally too:
+python run.py --auto 1            # invent a topic + generate (review)
+python run.py --auto 1 --publish  # invent a topic + generate + post
+```
 
-Start in **review mode** (no `--publish`) for the first dozen videos until the niche,
-voice, and caption style look right — then flip the scheduler to `--publish`.
+### The 4 things only you can do (it can't go live until you do them)
+
+1. **Own the accounts** — create the YouTube/TikTok/Instagram accounts (or just an
+   [Upload-Post](https://www.upload-post.com/) account that connects all three) and
+   connect them. No code can create accounts or grant OAuth for you.
+2. **Add the secrets** — in the repo: *Settings → Secrets and variables → Actions*, add
+   `ANTHROPIC_API_KEY`, `PEXELS_API_KEY`, `UPLOAD_POST_API_KEY`, `UPLOAD_POST_USER`.
+   The workflow physically cannot post or spend until these exist.
+3. **The budget** — API calls run on your keys (this lane is cheap: ~cents/video).
+4. **Flip it live** — add a repo **variable** `FACELESS_PUBLISH = true` (*Settings →
+   Secrets and variables → Actions → Variables*). Until then it stays in review mode.
+
+### Recommended go-live sequence
+
+1. Leave `FACELESS_PUBLISH` unset → let it generate ~10–15 videos, download the
+   artifacts, and sanity-check the niche/voice/caption style.
+2. Put your real **affiliate links in the account bio** (that's where the money is —
+   the caption CTA points there).
+3. Set `FACELESS_PUBLISH = true` and adjust the `cron` cadence to taste.
 
 ## Cost reality
 

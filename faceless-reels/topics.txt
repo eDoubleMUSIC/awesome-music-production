@@ -1,7 +1,10 @@
-# One topic per line. Lines starting with # are ignored.
-# Drive a content calendar by adding topics here and running:
-#   python run.py --topics-file topics.txt --publish
-the story behind the Roland TR-808 drum machine
-why the Amen break is the most sampled drum loop ever
-how sidechain compression creates the "pumping" sound in dance music
-the hidden math behind why minor keys sound sad
+# Manual fallback topics (the scheduled workflow auto-generates fresh ones instead).
+# AI tools / AI side-hustle lane. One topic per line; # lines are ignored.
+the AI tool that writes a week of content in one prompt
+how to clone your voice with AI for free
+3 ChatGPT prompts that save me hours every week
+the free AI tool that edits videos better than CapCut
+how people are making money with AI faceless channels
+turn any PDF into a study guide with this AI
+the AI note-taker that joins your meetings for you
+automate your whole inbox with this one AI workflow

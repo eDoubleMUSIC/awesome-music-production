@@ -1,13 +1,28 @@
 # Copy to config.yaml and fill in. Any value left as ${ENV_VAR} is read from the
-# environment at runtime, so you can keep secrets out of the file if you prefer.
+# environment at runtime, so you can keep secrets out of the file (the GitHub
+# Actions workflow relies on this — it copies this file and injects secrets as env).
 
 niche:
   # Steers the script. Be specific — this is the single biggest quality lever.
+  # Default lane: AI / tech tools — highest ROI for faceless automated content
+  # (top-tier RPM + an audience that buys software/products, not just ad pennies).
   description: >
-    Short, punchy faceless videos about music production history and hidden
-    techniques, narrated in a confident, slightly mysterious tone.
-  target_seconds: 30          # 5–90 for IG Reels eligibility
+    Short, punchy faceless videos about AI tools and AI side-hustles — what a new
+    AI tool does, how to use it to save time or make money, and quick AI news the
+    viewer can act on — in a clear, energetic, slightly nerdy tone. Every video ends
+    on a concrete takeaway and implies "the tool/links are in my bio."
+  target_seconds: 75          # 60+ so it clears TikTok Creator Rewards & earns more on Shorts
   words_per_minute: 165       # narration pace, used to size the script
+
+# Auto-topic generation: the workflow asks Claude for fresh topics each run, so the
+# pipeline is fully hands-off. topics.txt is only a manual fallback.
+auto_topics:
+  model: claude-opus-4-8
+  api_key: ${ANTHROPIC_API_KEY}
+  # Themes Claude draws from when inventing new video topics.
+  themes: >
+    new and trending AI tools, ChatGPT/Claude/Gemini tips, AI automation workflows,
+    AI for productivity, "this AI does X" demos, AI news the audience can act on.
 
 script:
   model: claude-opus-4-8
@@ -32,7 +47,8 @@ captions:
 publish:
   provider: upload_post       # upload_post | none
   upload_post_api_key: ${UPLOAD_POST_API_KEY}
-  upload_post_user: ""        # the profile name you set in the Upload-Post dashboard
+  upload_post_user: ${UPLOAD_POST_USER}   # the profile name you set in the Upload-Post dashboard
   platforms: [instagram, youtube, tiktok]
   # Caption/description template. {hook} is the first line of the script.
-  caption_template: "{hook}\n\n#musicproduction #synthwave #producer"
+  # Put your real affiliate links in the account bio; the CTA points there.
+  caption_template: "{hook}\n\n🔗 The AI tools I use → link in bio\n#ai #aitools #chatgpt #automation #tech"
