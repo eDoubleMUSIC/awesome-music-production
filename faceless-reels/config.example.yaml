@@ -1,0 +1,38 @@
+# Copy to config.yaml and fill in. Any value left as ${ENV_VAR} is read from the
+# environment at runtime, so you can keep secrets out of the file if you prefer.
+
+niche:
+  # Steers the script. Be specific — this is the single biggest quality lever.
+  description: >
+    Short, punchy faceless videos about music production history and hidden
+    techniques, narrated in a confident, slightly mysterious tone.
+  target_seconds: 30          # 5–90 for IG Reels eligibility
+  words_per_minute: 165       # narration pace, used to size the script
+
+script:
+  model: claude-opus-4-8
+  api_key: ${ANTHROPIC_API_KEY}
+
+voiceover:
+  # Any edge-tts voice. List them with: edge-tts --list-voices
+  voice: en-US-GuyNeural
+  rate: "+0%"
+
+visuals:
+  source: pexels              # pexels | color  (color = solid-bg fallback, no key needed)
+  pexels_api_key: ${PEXELS_API_KEY}
+  orientation: portrait
+
+captions:
+  whisper_model: base         # tiny | base | small | medium  (bigger = slower, more accurate)
+  font: Arial
+  font_size: 18
+  enabled: true
+
+publish:
+  provider: upload_post       # upload_post | none
+  upload_post_api_key: ${UPLOAD_POST_API_KEY}
+  upload_post_user: ""        # the profile name you set in the Upload-Post dashboard
+  platforms: [instagram, youtube, tiktok]
+  # Caption/description template. {hook} is the first line of the script.
+  caption_template: "{hook}\n\n#musicproduction #synthwave #producer"
