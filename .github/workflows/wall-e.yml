@@ -2,10 +2,11 @@ name: wall-e
 
 # WALL-E — the autonomous 24/7 watcher. Runs on GitHub's infrastructure (survives
 # any chat session ending) and keeps the faceless-reels generator healthy:
-#   * if the last generator run FAILED  -> re-runs its failed jobs
-#   * if the generator hasn't run in >25h (cadence stalled) -> kicks a fresh run
-#   * otherwise -> writes a heartbeat to the run summary
-# It needs no secrets — it uses the built-in GITHUB_TOKEN.
+#   * re-runs failed generator jobs (reflex, needs no keys)
+#   * with WALLE_* set, MiniMax M3 diagnoses each failure and decides self-heal vs escalate
+#   * with WALLACE_* set, a heavier model writes a deep diagnosis on escalation
+#   * posts heartbeats + escalations to one pinned GitHub issue
+# It never edits code or posts content — publish/spend/merge stay with a human.
 
 on:
   schedule:
@@ -13,45 +14,34 @@ on:
   workflow_dispatch:
 
 permissions:
-  actions: write             # to re-run / dispatch the generator
+  actions: write             # re-run / dispatch the generator
+  issues: write              # post status to the pinned issue
   contents: read
 
 jobs:
   watch:
     runs-on: ubuntu-latest
     steps:
-      - name: Watch the faceless-reels generator
-        uses: actions/github-script@v7
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
         with:
-          script: |
-            const workflow_id = 'faceless-reels.yml';
-            const { owner, repo } = context.repo;
-            const branch = context.ref.replace('refs/heads/', '');
+          python-version: "3.11"
 
-            const { data } = await github.rest.actions.listWorkflowRuns({
-              owner, repo, workflow_id, per_page: 10,
-            });
-            const runs = data.workflow_runs.filter(
-              r => r.event === 'schedule' || r.event === 'workflow_dispatch'
-            );
-            const latest = runs[0];
-            let note;
+      - name: Install watcher deps
+        run: pip install -r ops/requirements.txt
 
-            if (!latest) {
-              await github.rest.actions.createWorkflowDispatch({ owner, repo, workflow_id, ref: branch });
-              note = 'No prior generator runs found — dispatched one.';
-            } else {
-              const ageH = (Date.now() - new Date(latest.created_at).getTime()) / 3.6e6;
-              if (latest.status === 'completed' && latest.conclusion === 'failure') {
-                await github.rest.actions.reRunWorkflowFailedJobs({ owner, repo, run_id: latest.id });
-                note = `Run #${latest.run_number} FAILED — re-running its failed jobs.`;
-              } else if (latest.status === 'completed' && ageH > 25) {
-                await github.rest.actions.createWorkflowDispatch({ owner, repo, workflow_id, ref: branch });
-                note = `No generator run in ${ageH.toFixed(0)}h — dispatched one to hold cadence.`;
-              } else {
-                const state = latest.conclusion || latest.status;
-                note = `Healthy: run #${latest.run_number} = ${state}, ${ageH.toFixed(1)}h ago.`;
-              }
-            }
-            core.summary.addHeading('WALL-E watcher').addRaw(note).write();
-            core.info(note);
+      - name: Run WALL-E
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GENERATOR_WORKFLOW: faceless-reels.yml
+          WATCH_BRANCH: ${{ github.ref_name }}
+          # WALL-E brain (MiniMax M3) — secret for the key, vars for endpoint/model.
+          WALLE_API_KEY: ${{ secrets.WALLE_API_KEY }}
+          WALLE_BASE_URL: ${{ vars.WALLE_BASE_URL }}
+          WALLE_MODEL: ${{ vars.WALLE_MODEL }}
+          # Wallace (heavier escalation brain) — optional.
+          WALLACE_API_KEY: ${{ secrets.WALLACE_API_KEY }}
+          WALLACE_BASE_URL: ${{ vars.WALLACE_BASE_URL }}
+          WALLACE_MODEL: ${{ vars.WALLACE_MODEL }}
+        run: python ops/wall_e.py
