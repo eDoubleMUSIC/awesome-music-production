@@ -137,7 +137,7 @@ if (renderer) {
     for (let i = 0; i < count; i++) {
       pos[i * 3] = THREE.MathUtils.randFloatSpread(spread[0]);
       pos[i * 3 + 1] = THREE.MathUtils.randFloatSpread(spread[1]);
-      pos[i * 3 + 2] = THREE.MathUtils.randFloat(-360, 60);
+      pos[i * 3 + 2] = THREE.MathUtils.randFloat(-420, 60);
     }
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
@@ -157,6 +157,7 @@ if (renderer) {
     { color: 0x14204a, s: 170, p: [30, 50, -120], o: 0.12 },
     { color: 0x241a2e, s: 200, p: [-60, -30, -290], o: 0.14 },
     { color: 0x0e1836, s: 240, p: [70, 40, -330], o: 0.16 },
+    { color: 0x121c40, s: 260, p: [-50, 20, -390], o: 0.16 },
   ];
   for (const n of nebulaSpecs) {
     const m = new THREE.SpriteMaterial({
@@ -314,7 +315,41 @@ if (renderer) {
   soundRing.rotation.x = 0.18;
   scene.add(soundRing);
 
-  /* ---------- station 2 · constellation ---------- */
+  /* ---------- station 2 · obsidian monolith (the shop) ---------- */
+  const monolith = new THREE.Group();
+  const slab = new THREE.Mesh(
+    new THREE.BoxGeometry(2.2, 7.2, 0.9),
+    new THREE.MeshStandardMaterial({ color: 0x0a0d18, roughness: 0.18, metalness: 0.85 })
+  );
+  const slabEdges = new THREE.LineSegments(
+    new THREE.EdgesGeometry(slab.geometry),
+    new THREE.LineBasicMaterial({ color: AMBER, transparent: true, opacity: 0.55, toneMapped: false })
+  );
+  // orbiting shards
+  const shards = new THREE.Group();
+  for (let i = 0; i < 9; i++) {
+    const shard = new THREE.Mesh(
+      new THREE.TetrahedronGeometry(THREE.MathUtils.randFloat(0.14, 0.34), 0),
+      new THREE.MeshStandardMaterial({ color: 0x131a2e, roughness: 0.4, metalness: 0.7, flatShading: true })
+    );
+    const a = (i / 9) * Math.PI * 2;
+    const r = THREE.MathUtils.randFloat(3.2, 5.4);
+    shard.position.set(Math.cos(a) * r, THREE.MathUtils.randFloatSpread(4.5), Math.sin(a) * r);
+    shard.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
+    shards.add(shard);
+  }
+  const monoRing = new THREE.Mesh(
+    new THREE.TorusGeometry(4.6, 0.015, 8, 128),
+    new THREE.MeshBasicMaterial({ color: ICE, transparent: true, opacity: 0.3, toneMapped: false })
+  );
+  monoRing.rotation.x = Math.PI / 2 - 0.25;
+  monolith.add(slab, slabEdges, shards, monoRing);
+  monolith.position.set(13, 4, -158);
+  monolith.rotation.z = 0.06;
+  monolith.scale.setScalar(1.55);
+  scene.add(monolith);
+
+  /* ---------- station 3 · constellation ---------- */
   const constellation = new THREE.Group();
   const NODES = 16;
   const nodePts = [];
@@ -360,7 +395,7 @@ if (renderer) {
   north.scale.setScalar(3.4);
   north.position.copy(nodePts[0]);
   constellation.add(north);
-  constellation.position.set(13, 3, -168);
+  constellation.position.set(-13, 3, -222);
   scene.add(constellation);
 
   /* ---------- station 3 · spiral galaxy ---------- */
@@ -397,7 +432,7 @@ if (renderer) {
   galaxyCore.scale.setScalar(7);
   const galaxyGroup = new THREE.Group();
   galaxyGroup.add(galaxy, galaxyCore);
-  galaxyGroup.position.set(-13, 3, -238);
+  galaxyGroup.position.set(13, 3, -290);
   galaxyGroup.rotation.set(0.55, 0, 0.18);
   scene.add(galaxyGroup);
 
@@ -424,7 +459,7 @@ if (renderer) {
   );
   beaconRing.rotation.set(1.15, 0.45, 0);
   beacon.add(beaconGlow, beaconCore, flare, beaconRing);
-  beacon.position.set(0, 3, -305);
+  beacon.position.set(0, 3, -358);
   scene.add(beacon);
 
   /* ---------- drifting rocks for near-field parallax ---------- */
@@ -437,7 +472,7 @@ if (renderer) {
     rock.position.set(
       THREE.MathUtils.randFloatSpread(80),
       THREE.MathUtils.randFloat(-14, 20),
-      THREE.MathUtils.randFloat(-290, -10)
+      THREE.MathUtils.randFloat(-340, -10)
     );
     rock.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
     rock.userData.spin = THREE.MathUtils.randFloat(0.05, 0.22);
@@ -450,9 +485,10 @@ if (renderer) {
     [
       new THREE.Vector3(0, 4, 20),      // hero
       new THREE.Vector3(-6, 6, -64),    // → music
-      new THREE.Vector3(8, 3, -132),    // → studio
-      new THREE.Vector3(-8, 6, -202),   // → about
-      new THREE.Vector3(0, 3, -272),    // → connect
+      new THREE.Vector3(8, 3, -126),    // → shop
+      new THREE.Vector3(-8, 5, -188),   // → studio
+      new THREE.Vector3(8, 6, -254),    // → about
+      new THREE.Vector3(0, 3, -324),    // → connect
     ],
     false, 'catmullrom', 0.4
   );
@@ -460,6 +496,7 @@ if (renderer) {
   const lookTargets = [
     new THREE.Vector3(8, -2, -30),
     soundRing.position.clone().add(new THREE.Vector3(-5, 0, 0)),
+    monolith.position.clone().add(new THREE.Vector3(-6, 0, 0)),
     constellation.position.clone().add(new THREE.Vector3(-6, 0, 0)),
     galaxyGroup.position.clone().add(new THREE.Vector3(-6, 0, 0)),
     beacon.position.clone().add(new THREE.Vector3(-4, 0, 0)),
@@ -471,9 +508,10 @@ if (renderer) {
   /* ---------- per-station fade: each centerpiece only appears near its section ---------- */
   const stations = [
     { group: soundRing, idx: 1 },
-    { group: constellation, idx: 2 },
-    { group: galaxyGroup, idx: 3 },
-    { group: beacon, idx: 4 },
+    { group: monolith, idx: 2 },
+    { group: constellation, idx: 3 },
+    { group: galaxyGroup, idx: 4 },
+    { group: beacon, idx: 5 },
   ];
   for (const s of stations) {
     s.mats = [];
@@ -530,6 +568,10 @@ if (renderer) {
           (Math.sin(t * 1.7 + b.userData.phase) * 0.5 + 0.5) * 2.2 +
           (Math.sin(t * 3.3 + i * 0.9) * 0.5 + 0.5) * 0.5;
       }
+
+      monolith.rotation.y = t * 0.14;
+      shards.rotation.y = -t * 0.3;
+      monoRing.rotation.z = t * 0.1;
 
       constellation.rotation.y = t * 0.05;
 
