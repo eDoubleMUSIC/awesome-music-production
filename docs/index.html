@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>eDouble MUSIC — Singer · Songwriter · Producer · Engineer</title>
+  <meta name="description" content="eDouble (Eric Erickson) — Los Angeles singer, songwriter, producer & engineer. Music, beats, and studio services: production, mixing, mastering.">
+  <meta property="og:title" content="eDouble MUSIC">
+  <meta property="og:description" content="Music, beats, and studio services from L.A. — production, mixing, mastering.">
+  <meta name="theme-color" content="#06020f">
+  <link rel="icon" href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'&gt;&lt;circle cx='50' cy='50' r='46' fill='%2306020f'/&gt;&lt;circle cx='50' cy='50' r='30' fill='none' stroke='%23ff3d81' stroke-width='6'/&gt;&lt;circle cx='50' cy='50' r='8' fill='%2354e8ff'/&gt;&lt;/svg&gt;">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="importmap">
+    { "imports": { "three": "./vendor/three.module.min.js" } }
+  </script>
+</head>
+<body>
+
+  <!-- WebGL universe (fixed, behind everything) -->
+  <canvas id="scene" aria-hidden="true"></canvas>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <!-- Scroll progress -->
+  <div class="progress" aria-hidden="true"><div class="progress__bar" id="progressBar"></div></div>
+
+  <!-- Header -->
+  <header class="header">
+    <a class="brand" href="#home" aria-label="eDouble MUSIC — home">
+      <span class="brand__disc" aria-hidden="true"></span>
+      <span class="brand__name">eDouble<em>MUSIC</em></span>
+    </a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#music">Music</a>
+      <a href="#studio">Studio</a>
+      <a href="#about">About</a>
+      <a href="#connect" class="nav__cta">Connect</a>
+    </nav>
+  </header>
+
+  <!-- Section dots -->
+  <nav class="dots" aria-label="Section navigation">
+    <a href="#home"    data-dot title="Home"><span></span></a>
+    <a href="#music"   data-dot title="Music"><span></span></a>
+    <a href="#studio"  data-dot title="Studio"><span></span></a>
+    <a href="#about"   data-dot title="About"><span></span></a>
+    <a href="#connect" data-dot title="Connect"><span></span></a>
+  </nav>
+
+  <main id="content">
+
+    <!-- 01 · HERO -->
+    <section class="panel panel--hero" id="home" data-section="0">
+      <div class="panel__inner">
+        <p class="kicker" data-depth="0.6">Los Angeles, CA</p>
+        <h1 class="title" data-depth="1">
+          <span class="title__row">e<b>Double</b></span>
+          <span class="title__row title__row--sub">MUSIC</span>
+        </h1>
+        <p class="lede" data-depth="0.8">Singer · Songwriter · Producer · Engineer</p>
+        <div class="actions" data-depth="0.5">
+          <a class="btn btn--primary" href="#music">Hear the music</a>
+          <a class="btn btn--ghost" href="#studio">Book the studio</a>
+        </div>
+        <p class="scroll-hint" data-depth="0.4">scroll to dive in<span class="scroll-hint__line" aria-hidden="true"></span></p>
+      </div>
+    </section>
+
+    <!-- 02 · MUSIC -->
+    <section class="panel" id="music" data-section="1">
+      <div class="panel__inner">
+        <p class="kicker" data-depth="0.6">01 / Music</p>
+        <h2 class="heading" data-depth="1">A fusion of<br>everything I love.</h2>
+        <p class="copy" data-depth="0.8">
+          Genre lines are for maps, not for records. Songs, beats and remixes
+          built live — often on stream — from the first drum hit to the final vocal take.
+        </p>
+        <div class="cards" data-depth="0.6">
+          <a class="card" href="https://www.beatport.com/artist/eric-edoublemusic-erickson/589181" target="_blank" rel="noopener">
+            <span class="card__tag">Releases</span>
+            <span class="card__title">Beatport</span>
+            <span class="card__more">Listen →</span>
+          </a>
+          <a class="card" href="https://airbit.com/eDoubleMUSIC" target="_blank" rel="noopener">
+            <span class="card__tag">Beat store</span>
+            <span class="card__title">Airbit</span>
+            <span class="card__more">Browse beats →</span>
+          </a>
+          <a class="card" href="https://ccmixter.org/people/eDoubleMUSIC/profile" target="_blank" rel="noopener">
+            <span class="card__tag">Remixes &amp; stems</span>
+            <span class="card__title">ccMixter</span>
+            <span class="card__more">Dig in →</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 · STUDIO -->
+    <section class="panel" id="studio" data-section="2">
+      <div class="panel__inner">
+        <p class="kicker" data-depth="0.6">02 / Studio Services</p>
+        <h2 class="heading" data-depth="1">Your song,<br>finished right.</h2>
+        <p class="copy" data-depth="0.8">
+          25+ years of records. Bring a voice memo, a rough demo, or a finished
+          arrangement — leave with something that hits on every system.
+        </p>
+        <ul class="services" data-depth="0.6">
+          <li class="service">
+            <h3>Production</h3>
+            <p>Writing, arrangement and full instrumentals — from scratch or around your idea.</p>
+          </li>
+          <li class="service">
+            <h3>Mixing</h3>
+            <p>Balance, depth and punch. Your record, translated to every speaker.</p>
+          </li>
+          <li class="service">
+            <h3>Mastering</h3>
+            <p>The final polish — loud, clean and release-ready for every platform.</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 04 · ABOUT -->
+    <section class="panel" id="about" data-section="3">
+      <div class="panel__inner">
+        <p class="kicker" data-depth="0.6">03 / About</p>
+        <h2 class="heading" data-depth="1">Music is my life.</h2>
+        <p class="copy" data-depth="0.8">
+          I'm Eric Erickson — eDouble. Singer, songwriter, producer and engineer
+          based in Los Angeles. I go live to make beats, write songs and record
+          vocals in real time, and I've spent two and a half decades helping
+          artists turn ideas into records.
+        </p>
+        <div class="stats" data-depth="0.6">
+          <div class="stat"><span class="stat__num" data-count="25">0</span><span class="stat__label">years+ making records</span></div>
+          <div class="stat"><span class="stat__num" data-count="4">0</span><span class="stat__label">roles, one chair</span></div>
+          <div class="stat"><span class="stat__num" data-count="1">0</span><span class="stat__label">rule: serve the song</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 · CONNECT -->
+    <section class="panel panel--connect" id="connect" data-section="4">
+      <div class="panel__inner">
+        <p class="kicker" data-depth="0.6">04 / Connect</p>
+        <h2 class="heading" data-depth="1">Let's make<br>something.</h2>
+        <p class="copy" data-depth="0.8">
+          Catch a live session, grab a beat, or book time for your next record.
+        </p>
+        <div class="socials" data-depth="0.6">
+          <a href="https://x.com/edoublemusic" target="_blank" rel="noopener">X / Twitter</a>
+          <a href="https://www.instagram.com/edoublemusic/" target="_blank" rel="noopener">Instagram</a>
+          <a href="https://www.facebook.com/eDoubleMUSIC" target="_blank" rel="noopener">Facebook</a>
+          <a href="https://airbit.com/eDoubleMUSIC" target="_blank" rel="noopener">Airbit</a>
+          <a href="https://www.beatport.com/artist/eric-edoublemusic-erickson/589181" target="_blank" rel="noopener">Beatport</a>
+        </div>
+        <footer class="footer" data-depth="0.4">
+          <p>© <span id="year"></span> eDouble MUSIC · Los Angeles, CA</p>
+        </footer>
+      </div>
+    </section>
+
+  </main>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
